@@ -12,15 +12,17 @@
 
 #include <stddef.h>
 
-// Fills the given output_buffer with the data from input_buffer encoded as base64.
+// Given an input_buffer of bytes, fills output_buffer with the corresponding
+// base64-encoded string, padded to a multiple of 4 bytes.
 // Returns the number of bytes written to output_buffer on success, or 0 on failure.
 // As long as input_buffer_length > 0, a return value of 0 will always indicate failure.
-size_t base64_encode(unsigned char* input_buffer, size_t input_buffer_length, unsigned char* output_buffer, size_t output_buffer_length);
+size_t base64_encode(const unsigned char* input_buffer, size_t input_buffer_length, unsigned char* output_buffer, size_t output_buffer_length);
 
-// Fills the given output_buffer with the data from input_buffer decoded as base64.
+// Given input_buffer containing a base64-encoded string, fills output_buffer
+// with the corresponding decoded bytes.
 // Returns the number of bytes written to output_buffer on success, or 0 on failure.
 // As long as input_buffer_length > 0, a return value of 0 will always indicate failure.
-size_t base64_decode(unsigned char* input_buffer, size_t input_buffer_length, unsigned char* output_buffer, size_t output_buffer_length);
+size_t base64_decode(const unsigned char* input_buffer, size_t input_buffer_length, unsigned char* output_buffer, size_t output_buffer_length);
 
 // ====================
 // Implementation below
@@ -45,7 +47,7 @@ const unsigned char cb64_alphabet_lookup[] =
     26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, // Lower-case characters
 };
 
-size_t base64_encode(unsigned char* input_buffer, size_t input_buffer_length, unsigned char* output_buffer, size_t output_buffer_length)
+size_t base64_encode(const unsigned char* input_buffer, size_t input_buffer_length, unsigned char* output_buffer, size_t output_buffer_length)
 {
     // TODO: Support alternative alphabets (e.g -_ in place of +/), for things like url-safe en/decoding
     unsigned char padding = '=';
@@ -102,7 +104,7 @@ size_t base64_encode(unsigned char* input_buffer, size_t input_buffer_length, un
     return bytes_written;
 }
 
-size_t base64_decode(unsigned char* input_buffer, size_t input_buffer_length, unsigned char* output_buffer, size_t output_buffer_length)
+size_t base64_decode(const unsigned char* input_buffer, size_t input_buffer_length, unsigned char* output_buffer, size_t output_buffer_length)
 {
     if(input_buffer_length % 4 != 0)
     {

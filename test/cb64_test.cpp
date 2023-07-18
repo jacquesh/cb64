@@ -211,8 +211,32 @@ TEST_CASE("Very long strings encode & decode correctly")
     delete[] decoded;
 }
 
+TEST_CASE("Decode fails when given a 'base64' string with invalid characters")
+{
+    // TODO: This test passes if we use characters like pipe that are off the end of the
+    //       ASCII valid-base64 range, but will fail for characters like # that are in the
+    //       middle but not used.
+    const char* encoded = "q80|"; // 'q80=' is '0xABCD'
+    unsigned char decoded[32] = {};
+    size_t decoded_bytes = base64_decode((const unsigned char*)encoded, strlen(encoded), decoded, sizeof(decoded));
+    REQUIRE(decoded_bytes == 0);
+}
+
+TEST_CASE("Decode fails when given a 'base64' string with an invalid length")
+{
+    const char* encoded = "q80=="; // 'q80=' is '0xABCD'
+    unsigned char decoded[32] = {};
+    size_t decoded_bytes = base64_decode((const unsigned char*)encoded, strlen(encoded), decoded, sizeof(decoded));
+    REQUIRE(decoded_bytes == 0);
+}
+
+TEST_CASE("Decode fails output buffer is too small")
+{
+    const char* encoded = "8fLz9A=="; // '8fLz9A== is 0xF1F2F3F4 (4 bytes)
+    unsigned char decoded[3] = {};
+    size_t decoded_bytes = base64_decode((const unsigned char*)encoded, strlen(encoded), decoded, sizeof(decoded));
+    REQUIRE(decoded_bytes == 0);
+}
+
 // TODO: Tests for:
-// - Invalid input buffer bytes/characters (when decoding)
-// - Invalid input buffer length (when decoding, that's a thing I believe?)
 // - Successfully decode unpadded input (IE missing the trailing ==s)
-// - Not enough output space
